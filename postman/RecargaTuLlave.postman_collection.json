@@ -1,0 +1,83 @@
+{
+  "info": {
+    "_postman_id": "6af6b98a-9358-4ab5-93af-tlvrcg26",
+    "name": "TLV-RCG-26",
+    "description": "Coleccion de pruebas funcionales para la API de Recargas Digitales tuLlave.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080" },
+    { "key": "rechargeId", "value": "1" },
+    { "key": "cardNumber", "value": "1010000012345678" }
+  ],
+  "item": [
+    {
+      "name": "Success",
+      "item": [
+        {
+          "name": "Create recharge",
+          "event": [{
+            "listen": "test",
+            "script": {"exec": [
+              "pm.test('Status is 201', () => pm.response.to.have.status(201));",
+              "const body = pm.response.json();",
+              "pm.expect(body.message).to.eql('Recharge created successfully');",
+              "pm.collectionVariables.set('rechargeId', body.data.id);"
+            ]}
+          }],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"cardNumber\": \"{{cardNumber}}\",\n  \"amount\": 50000,\n  \"paymentMethod\": \"NEQUI\"\n}"},
+            "url": {"raw": "{{baseUrl}}/api/v1/recharges", "host": ["{{baseUrl}}"], "path": ["api", "v1", "recharges"]}
+          }
+        },
+        {
+          "name": "Get recharges",
+          "event": [{"listen": "test", "script": {"exec": ["pm.test('Status is 200', () => pm.response.to.have.status(200));"]}}],
+          "request": {"method": "GET", "url": {"raw": "{{baseUrl}}/api/v1/getRecharges?page=0&size=10", "host": ["{{baseUrl}}"], "path": ["api", "v1", "getRecharges"], "query": [{"key":"page","value":"0"},{"key":"size","value":"10"}]}}
+        },
+        {
+          "name": "Filter by cardNumber",
+          "event": [{"listen": "test", "script": {"exec": ["pm.test('Status is 200', () => pm.response.to.have.status(200));"]}}],
+          "request": {"method": "GET", "url": {"raw": "{{baseUrl}}/api/v1/getRecharges?page=0&size=10&cardNumber={{cardNumber}}", "host": ["{{baseUrl}}"], "path": ["api", "v1", "getRecharges"], "query": [{"key":"page","value":"0"},{"key":"size","value":"10"},{"key":"cardNumber","value":"{{cardNumber}}"}]}}
+        },
+        {
+          "name": "Delete recharge",
+          "event": [{"listen": "test", "script": {"exec": ["pm.test('Status is 204', () => pm.response.to.have.status(204));"]}}],
+          "request": {"method": "DELETE", "url": {"raw": "{{baseUrl}}/api/v1/recharges/{{rechargeId}}", "host": ["{{baseUrl}}"], "path": ["api", "v1", "recharges", "{{rechargeId}}"]}}
+        }
+      ]
+    },
+    {
+      "name": "Errors",
+      "item": [
+        {
+          "name": "Invalid card number",
+          "event": [{"listen":"test","script":{"exec":["pm.test('Status is 400', () => pm.response.to.have.status(400));"]}}],
+          "request": {"method":"POST","header":[{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\n  \"cardNumber\": \"12345\",\n  \"amount\": 50000,\n  \"paymentMethod\": \"NEQUI\"\n}"},"url":{"raw":"{{baseUrl}}/api/v1/recharges","host":["{{baseUrl}}"],"path":["api","v1","recharges"]}}
+        },
+        {
+          "name": "Amount below minimum",
+          "event": [{"listen":"test","script":{"exec":["pm.test('Status is 400', () => pm.response.to.have.status(400));"]}}],
+          "request": {"method":"POST","header":[{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\n  \"cardNumber\": \"{{cardNumber}}\",\n  \"amount\": 1000,\n  \"paymentMethod\": \"NEQUI\"\n}"},"url":{"raw":"{{baseUrl}}/api/v1/recharges","host":["{{baseUrl}}"],"path":["api","v1","recharges"]}}
+        },
+        {
+          "name": "Amount above maximum",
+          "event": [{"listen":"test","script":{"exec":["pm.test('Status is 400', () => pm.response.to.have.status(400));"]}}],
+          "request": {"method":"POST","header":[{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\n  \"cardNumber\": \"{{cardNumber}}\",\n  \"amount\": 300000,\n  \"paymentMethod\": \"NEQUI\"\n}"},"url":{"raw":"{{baseUrl}}/api/v1/recharges","host":["{{baseUrl}}"],"path":["api","v1","recharges"]}}
+        },
+        {
+          "name": "Invalid payment method",
+          "event": [{"listen":"test","script":{"exec":["pm.test('Status is 400', () => pm.response.to.have.status(400));"]}}],
+          "request": {"method":"POST","header":[{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\n  \"cardNumber\": \"{{cardNumber}}\",\n  \"amount\": 50000,\n  \"paymentMethod\": \"PAYPAL\"\n}"},"url":{"raw":"{{baseUrl}}/api/v1/recharges","host":["{{baseUrl}}"],"path":["api","v1","recharges"]}}
+        },
+        {
+          "name": "Recharge not found",
+          "event": [{"listen":"test","script":{"exec":["pm.test('Status is 404', () => pm.response.to.have.status(404));"]}}],
+          "request": {"method":"DELETE","url":{"raw":"{{baseUrl}}/api/v1/recharges/999999","host":["{{baseUrl}}"],"path":["api","v1","recharges","999999"]}}
+        }
+      ]
+    }
+  ]
+}
