@@ -1,4 +1,4 @@
-# TLV-RCG-26 — API de Recargas Digitales tuLlave
+# RecargaTuLlave — API de Recargas Digitales tuLlave
 
 API REST desarrollada con **Java 21**, **Spring Boot 3.3.5**, **Spring Data JPA** y **PostgreSQL** para registrar, consultar y eliminar recargas digitales.
 
@@ -52,7 +52,7 @@ Responsabilidades principales:
 ## 3. Estructura del proyecto
 
 ```text
-TLV-RCG-26/
+RecargaTuLlave/
 ├── postman/
 │   └── TLV-RCG-26.postman_collection.json
 ├── scripts/
@@ -77,6 +77,8 @@ TLV-RCG-26/
 │   └── test/
 │       └── java/co/tullave/rcg/service/
 │           └── RechargeServiceImplTest.java
+├── tools/
+│   └── mvnd/
 ├── .dockerignore
 ├── .env.example
 ├── .gitignore
@@ -151,19 +153,54 @@ docker compose down -v
 
 ## 6. Ejecución local
 
-Si se desea ejecutar fuera de Docker, se requiere:
+Para ejecutar el proyecto fuera de Docker se requiere:
 
-- Java 21 o superior.
+- Java 21.
 - Maven 3.9+.
 - PostgreSQL disponible.
 
-Compilar y ejecutar pruebas:
+### Maven incluido para desarrollo
+
+El proyecto incluye una distribución local de Maven en:
+
+```text
+tools/mvnd/
+```
+
+En Windows PowerShell se puede ejecutar directamente:
+
+```powershell
+.\tools\mvnd\bin\mvn.cmd test
+```
+
+Para compilar el proyecto:
+
+```powershell
+.\tools\mvnd\bin\mvn.cmd clean package
+```
+
+También puede utilizarse una instalación global de Maven:
 
 ```bash
+mvn test
 mvn clean package
 ```
 
-Ejecutar la aplicación:
+### Validación actual
+
+La suite de pruebas unitarias fue ejecutada correctamente:
+
+```text
+Tests run: 5
+Failures: 0
+Errors: 0
+Skipped: 0
+BUILD SUCCESS
+```
+
+### Ejecutar la aplicación
+
+Después de compilar:
 
 ```bash
 java -jar target/TLV-RCG-26-1.0.0.jar
@@ -206,21 +243,6 @@ Ejemplo:
 ```
 
 Respuesta esperada: `201 Created`.
-
-```json
-{
-  "timestamp": "2026-10-04T01:22:34.259625",
-  "status": 201,
-  "message": "Recharge created successfully",
-  "data": {
-    "id": 1,
-    "cardNumber": "1010000012345678",
-    "amount": 50000.00,
-    "paymentMethod": "NEQUI",
-    "createdAt": "2026-10-04T01:22:34.259625"
-  }
-}
-```
 
 ### Listar recargas
 
@@ -294,8 +316,8 @@ Por seguridad, el número completo de tarjeta no se registra en los logs.
 
 Ejecutar:
 
-```bash
-mvn test
+```powershell
+.\tools\mvnd\bin\mvn.cmd test
 ```
 
 Las pruebas de `RechargeServiceImpl` cubren:
@@ -373,9 +395,9 @@ El `Dockerfile` utiliza una etapa de compilación con Maven y una imagen JRE sep
 
 Docker Compose espera a que PostgreSQL esté listo antes de iniciar la API, evitando condiciones de carrera durante el arranque.
 
-## 15. Flujo Git sugerido
+## 15. Flujo Git
 
-Ramas:
+Ramas principales utilizadas:
 
 ```text
 main
@@ -395,7 +417,7 @@ test: add recharge service unit tests
 docs: document API setup and architecture
 ```
 
-Antes de entregar se recomienda crear al menos un Pull Request hacia `main`, documentando los cambios y las pruebas realizadas.
+El proyecto cuenta con Pull Requests integrados hacia `main`.
 
 ## 16. Mejoras para un escenario productivo
 
@@ -427,6 +449,9 @@ El alcance de esta prueba es deliberadamente pequeño. Para una operación produ
 - [x] JUnit 5 + Mockito.
 - [x] Colección Postman `TLV-RCG-26`.
 - [x] README con arquitectura y decisiones técnicas.
-- [ ] Publicar repositorio Git y crear Pull Request antes de la entrega.
+- [x] Repositorio Git publicado.
+- [x] Pull Requests integrados hacia `main`.
+- [x] Pruebas unitarias ejecutadas correctamente.
 
-Ref. interna: TLV-RCG-26
+---
+
